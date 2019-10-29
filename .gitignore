@@ -1,0 +1,4 @@
+.vagrant/
+first_repo/
+*.log
+*.box
