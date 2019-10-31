@@ -1,0 +1,7 @@
+- hosts: all
+  remote_user: vagrant
+  become: yes
+  tasks:
+          - name: Ajustando o TimeZone do Servidor
+            timezone:
+                    name: America/Sao_Paulo
