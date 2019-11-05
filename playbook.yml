@@ -5,3 +5,58 @@
           - name: Ajustando o TimeZone do Servidor
             timezone:
                     name: America/Sao_Paulo
+- hosts: db
+  remote_user: vagrant
+  become: yes
+  tasks:
+          - name: Criando o Arquivo Info
+            lineinfile:
+                    path: /tmp/info
+                    line: SERVIDOR DE BANCO DE DADOS MYSQL
+                    create: yes
+          - name: Instalando mysql server
+            apt:
+                    name: mysql-server
+                    state: present
+- hosts: web
+  remote_user: vagrant
+  become: yes
+  tasks:
+          - name: Criando o Arquivo Info
+            lineinfile:
+                    path: /tmp/info
+                    line: SERVIDOR DO BLOG WORDPRESS
+                    create: yes
+          - name: Instalando Apache
+            apt:
+                    name: apache2
+                    state: present
+          - name: Instalando dependencias
+            apt:
+                    pkg:
+                            - php7.2
+                            - php7.2-mysql
+                            - libapache2-mod-php7.2
+                            - php7.2-cli
+                            - php7.2-cgi
+                            - php7.2-gd
+                            - apache2-utils
+                    state: present
+          - name: enable service apache2
+            systemd:
+                    name: apache2
+                    enabled: yes
+                    masked: no
+          - name: start apache2
+            systemd:
+                    state: started
+                    name: apache2
+- hosts: engine
+  remote_user: vagrant
+  become: yes
+  tasks:
+          - name: Criando o Arquivo Info
+            lineinfile:
+                    path: /tmp/info
+                    line: SERVIDOR ANSIBLE CONTROLLER
+                    create: yes
