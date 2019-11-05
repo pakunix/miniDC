@@ -18,6 +18,14 @@
             apt:
                     name: mysql-server
                     state: present
+          - name: Instalando dependencias mysql
+            apt:
+                    pkg:
+                            - python-pymysql
+                            - python3-pymysql
+                            - python-apt
+                            - python3-apt
+                    state: present
 - hosts: web
   remote_user: vagrant
   become: yes
