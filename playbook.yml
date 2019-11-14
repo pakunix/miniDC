@@ -14,18 +14,47 @@
                     path: /tmp/info
                     line: SERVIDOR DE BANCO DE DADOS MYSQL
                     create: yes
+          - name: Definindo a Senha de Administrador do MySQL
+            debconf: name='mysql-server' question='mysql-server/root_password' value='123' vtype='password'
+
+          - name: Confirmando a Senha de Administrador do MySQL
+            debconf: name='mysql-server' question='mysql-server/root_password_again' value='123' vtype='password'          
+
           - name: Instalando mysql server
             apt:
-                    name: mysql-server
                     state: present
-          - name: Instalando dependencias mysql
-            apt:
+                    update_cache: yes
                     pkg:
-                            - python-pymysql
-                            - python3-pymysql
-                            - python-apt
-                            - python3-apt
+                    - mysql-server
+                    - python-pymysql
+                      
+          - name: Criando banco de dados para wordpress
+            mysql_db:
+                    name: wordpress
                     state: present
+                    login_user: root
+                    login_password: 123
+          - name: Criando o usuario do banco
+            mysql_user:
+                    name: wordpress
+                    password: impacta
+                    priv: '*.*:ALL'
+                    state: present
+                    host: 172.17.177.22
+                    login_user: root
+                    login_password: 123
+          - name: Configurando bind MySQL
+            lineinfile:
+                    path: /etc/mysql/mysql.conf.d/mysqld.cnf
+                    regexp: '^bind-address'
+                    line: bind-address = 0.0.0.0
+                    notify:
+                            - restart mysql
+                    handlers:
+                            - name: restart mysql
+                              service:
+                                      name: mysql
+                                      state: restarted
 - hosts: web
   remote_user: vagrant
   become: yes
@@ -49,6 +78,7 @@
                             - php7.2-cgi
                             - php7.2-gd
                             - apache2-utils
+                            - mysql-client
                     state: present
           - name: enable service apache2
             systemd:
